@@ -14,7 +14,14 @@ dependencies = [
     "matplotlib",
     "pandas",
     "tqdm",
+    "cupy-cuda12x",
+    "torch>=2.0",
 ]
 
 [tool.setuptools.packages.find]
 where = ["."]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+]
