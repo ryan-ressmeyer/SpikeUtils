@@ -1,5 +1,15 @@
-**/__pycache__/
-*.egg-info
-build
-dist
-.venv
+# Virtual environment
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+
+# Build artifacts
+build/
+dist/
+
+# OS files
+.DS_Store

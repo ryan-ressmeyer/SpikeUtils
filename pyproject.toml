@@ -7,7 +7,7 @@ name = "spike-utils"
 version = "0.1.0"
 description = "Utilities for analyzing spiking neural data."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11, <3.13"
 dependencies = [
     "numpy",
     "scipy",
