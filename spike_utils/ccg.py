@@ -6,6 +6,15 @@ import numpy as np
 from tqdm import tqdm
 
 
+def _scatter_add(flat_arr, indices, xp):
+    """Add 1 at each index, handling duplicate indices correctly."""
+    if xp is np:
+        np.add.at(flat_arr, indices, 1)
+    else:
+        import cupyx
+        cupyx.scatter_add(flat_arr, indices, 1)
+
+
 def calc_ccgs(
     spike_times: np.ndarray,
     bin_edges: np.ndarray,
@@ -151,8 +160,7 @@ def calc_ccgs(
                 pos_i, pos_j = spike_inds[valid_indices], spike_inds[valid_indices + shift]
                 pos_bins = digitize(pos_dts[valid_pos])
                 ravel_inds = xp.ravel_multi_index((pos_i, pos_j, pos_bins), ccgs.shape)
-                counts = xp.bincount(ravel_inds, minlength=ccgs.size)
-                ccgs += counts.reshape(ccgs.shape)
+                _scatter_add(ccgs.ravel(), ravel_inds, xp)
             pos_mask[active_pos_indices] = pos_dts < max_bin
 
         # --- Negative Lags (Ref: i + shift, Target: i) ---
@@ -168,8 +176,7 @@ def calc_ccgs(
                 neg_i, neg_j = spike_inds[valid_indices + shift], spike_inds[valid_indices]
                 neg_bins = digitize(neg_dts[valid_neg])
                 ravel_inds = xp.ravel_multi_index((neg_i, neg_j, neg_bins), ccgs.shape)
-                counts = xp.bincount(ravel_inds, minlength=ccgs.size)
-                ccgs += counts.reshape(ccgs.shape)
+                _scatter_add(ccgs.ravel(), ravel_inds, xp)
             neg_mask[active_neg_indices + shift] = neg_dts > min_bin
 
         # --- Loop Control and Progress Update ---
